@@ -140,6 +140,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="it_lvl_up.cpp" />
+    <ClCompile Include="menu_function.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="menu_function.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

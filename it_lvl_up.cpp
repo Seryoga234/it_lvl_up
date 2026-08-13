@@ -1,15 +1,9 @@
 #include <iostream>  // ; meow/мяу
-
-
-std::string hello() {
-	
-}
-
-
+#include "menu_function.h"
 
 int main() {   // маркер для хакера , л - логика
 
-	std::cout << " -----====== Welcome to your LEVEL UP ======----- " << std::endl;
+	menu();
 
-	
+	return 0;
 }
