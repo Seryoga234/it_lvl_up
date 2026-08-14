@@ -1,12 +1,15 @@
 #include "menu_function.h"
 #include <iostream>
+#include <ctime>
+
+
 
 void menu() {
 
 	std::cout << " -----====== Welcome to your LEVEL UP ======----- " << std::endl;
 
 	std::cout << " MENU\n 1. Work\n 2. My Projects\n 3. Study\n 4. Import Data" << std::endl;
-
+	
 	int choice;
 	;
 

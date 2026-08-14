@@ -141,9 +141,11 @@
   <ItemGroup>
     <ClCompile Include="it_lvl_up.cpp" />
     <ClCompile Include="menu_function.cpp" />
+    <ClCompile Include="time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="menu_function.h" />
+    <ClInclude Include="time.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
