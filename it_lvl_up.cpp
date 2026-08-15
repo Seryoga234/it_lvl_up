@@ -1,17 +1,16 @@
 #include <iostream>  // ; meow/мяу
 #include "menu_function.h"
+#include "time.h"
 #include <ctime>
 
 
-
-void ddd() {
-}
-
 int main() {   // маркер для хакера , л - логика
 
-	std::time_t start = std::time(nullptr);
-
-	volatile double f = 4;
+	time();
+	// double difftime( std::time_t time_end, std::time_t time_start );
+	// std::time_t time( std::time_t* arg );
+	// std::gmtime();
+	
 
 	menu();
 

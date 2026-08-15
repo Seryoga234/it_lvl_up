@@ -2,9 +2,44 @@
 #include <iostream>
 #include <ctime>
 
+char letter;
+
+/*int timer() {
+
+	volatile int f = 4;
+	std::time_t start = std::time(nullptr); //std::time_t start - коробка для переменной. std::time() - сомтрит на дату устройства
+
+	std::time_t end = std::time(nullptr);
+
+	switch (letter) {
+	
+	}
+
+
+	int a;
+
+	for (a = start; a < end; a++)
+	{
+
+	}
+	return 0;
+
+}*/
+
+/*int ended() {
+	std::time_t end = std::time(nullptr);
+	return end;
+}
+int started() {
+	std::time_t start = std::time(nullptr);
+	int st[1] = { start };
+	return st[1];
+}*/
+
+
 void time() { // тупо чтоб выполнить задачу.
 
-
+	int result;
 	struct tm {
 
 		int tm_sec;
@@ -19,31 +54,56 @@ void time() { // тупо чтоб выполнить задачу.
 
 	};
 
-	// difftime = time_beg time_end
+	// double difftime( std::time_t time_end, std::time_t time_start );
+	// std::time_t time( std::time_t* arg );
 	//std::gmtime();
 
-	char letter;
+	std::cout << " If you wanna Start press  ' -- S -- '\n";
+	std::cout << " If you wanna End timer press  ' -- E -- '\n";
+	std::cout << " If you wanna go Out of timer press  ' -- O -- '\n";
 
-	std::cout << " If you wanna start press '-- S --'\n";
+	//int a = started();
+	//int b = ended();
+	std::time_t start = 0;
+	std::time_t end = 0;
+	int seconds;
 	do
 	{
 		std::cin >> letter;
 		switch (letter) {
 		case 's':
-		case 'S':
+		case 'S': 
 			std::cout << " Timer is Strat!\n";
+			start = std::time(nullptr);
+			std::cout << start << std::endl;
 			break;
+		 
 		case 'e':
-		case 'E':
-			std::cout << " Timer is End!\n";
+		case 'E':  
+			std::cout << " Timer is End! ";
+			end = std::time(nullptr);
+			std::cout << end << "\n";
+			seconds = std::difftime(end, start);
+			std::cout << seconds;
+			/*for (int a = started(), b = ended(); a <= b;)
+			{
+				std::cout << (result = b - a)<< std::endl;
+			}*/
+
 			break;
+		  
+
+		case 'o':
+		case 'O':
+			std::cout << "Exit...\n";
+			break;
+
 		default:
 			std::cout << " Wrong letter! Try again...\n";
 			break;
 		}
 
-	} while (letter != 'S' && letter != 's' && letter != 'E' && letter != 'e');
-
-
-
+	} while (letter != 'o' && letter != 'O');
 }
+		//while (letter != 'S' && letter != 's' && letter != 'E' && letter != 'e');
+	
