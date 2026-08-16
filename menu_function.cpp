@@ -1,7 +1,7 @@
 #include "menu_function.h"
 #include <iostream>
 #include <ctime>
-
+#include "time.h"
 
 
 void menu() {
@@ -26,7 +26,8 @@ void menu() {
 				switch (choice) {
 				case 1:
 					// open function #1 (Work Time).
-					std::cout << " 1111\n";
+					std::cout << " Open timer...\n";
+					time();
 					break;
 				case 2:
 					// open function #2 (Notes).
