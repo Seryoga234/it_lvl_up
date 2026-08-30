@@ -27,6 +27,9 @@
     <ClCompile Include="sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="notes_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="menu_function.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="notes_memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
