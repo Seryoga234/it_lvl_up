@@ -59,7 +59,10 @@ int notes_m() {
     if (sqlite3_prepare_v2(db, insertSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         // В первый знак вопроса (1) пихаем НАЗВАНИЕ
         sqlite3_bind_text(stmt, 1, noteTitle.c_str(), -1, SQLITE_STATIC); //для сохранения. 1 это номер колонки (title)
-
+        // std::ofstream myFile(noteTitle); ////////////////
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            std::ofstream myFile(noteTitle + ".txt");
+        }
         // Во второй знак вопроса (2) пихаем ДЛИННЫЙ ТЕКСТ С КОДОМ
         sqlite3_bind_text(stmt, 2, noteContent.c_str(), -1, SQLITE_STATIC); // 2 это номер колонки (content)
 
@@ -67,9 +70,12 @@ int notes_m() {
             std::cout << " ИТ-заметка успешно сохранена!\n";
         }
         sqlite3_finalize(stmt); // Убрали мусор из оперативки
+
+
+
     }
 
-
+    // 5. ШАГ ТРЕТИЙ: Читаем все заметки из файла (SELECT)
     std::string selectSQL = "SELECT id, title, content FROM notes;";
 
     if (sqlite3_prepare_v2(db, selectSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
@@ -84,35 +90,11 @@ int notes_m() {
             std::cout << content << "\n"; // Тут выведется весь твой код Ассемблера
             std::cout << "========================================\n\n";
         }
-        sqlite3_finalize(stmt);
-    }
-
-
-
-
-
-    // 5. ШАГ ТРЕТИЙ: Читаем все заметки из файла (SELECT)
-    //std::string selectSQL = "SELECT id, text FROM notes;";
-
-    if (sqlite3_prepare_v2(db, selectSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-        std::cout << "\n--- СПИСОК ЗАМЕТОК ИЗ ФАЙЛА ---" << std::endl;
-
-        // Цикл идет по строкам базы, пока они там есть
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            // Вытаскиваем ID из нулевой колонки (id)
-            int id = sqlite3_column_int(stmt, 0); // на нулевой позиции в первом ящике/колонке.
-            // Вытаскиваем ТЕКСТ из первой колонки (text)
-            std::string text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));//
-            // 1 - это во втором ящике. UTF-8 - динамический 1 байт(подстривается).
-            // reinterpret_cast - дает права const char* на внутренний unsigned char* 
-
-            // Выводим на экран то, что прочитали из файла
-            std::cout << "Заметка #" << id << ": " << text << std::endl;
-        }
-        std::cout << "--------------------------------\n" << std::endl;
-
         sqlite3_finalize(stmt); // Очищаем память за запросом
     }
+
+    
+    //std::string selectSQL = "SELECT id, text FROM notes;";
 
 
     // 6. Закрываем базу данных, сохраняя все изменения на диск
