@@ -42,62 +42,145 @@ int main() {   // маркер для хакера , л - логика
 
 	setlocale(LC_ALL, ".UTF-8");
 
-	std::string title;
-	std::string content;
+	sqlite3* db = nullptr;
 
-	std::cout << " Enter title\n";
-	std::getline(std::cin, title);
+	std::string noteTitle;
+	std::string noteContent;
 
+	//std::cout << " Enter title\n";
+	//std::getline(std::cin, noteTitle);
+
+	std::cout << " Do you wanna Create or Existing file\n";
+	std::cout << " Press ' 1 'to Create\n Press ' 2 ' to Existing file\n";
+
+	int userSymb;
+	std::cin >> userSymb;
 
 	do
 	{
-		std::cout << " Do you wanna Create or Existing file\n";
-		std::cout << " Press ' 1 'to Create\n Press ' 2 ' to Existing file\n";
-		int* userSymb = new int();
-
-		const short a = 2;
-
-		std::cin >> *userSymb;
-		if (*userSymb == 1)
+		
+		
+		if (userSymb == 1)
 		{
-			//delete userSymb;
-			//userSymb= nullptr;
-			std::ofstream myFile(title + ".txt");
+
+			if (sqlite3_open("note_memory.db", &db) != SQLITE_OK) {  // sqlite3_open - Открываем файл , строчка как if (проверяет)
+				// SQLITE_OK - означает, что операция прошла успешно
+				std::cerr << "Не удалось открыть или создать файл базы данных!" << std::endl; // std::cerr
+				return 1;
+			}
+			
+			std::string createTableSQL =
+				"CREATE TABLE IF NOT EXISTS notes ("
+				"id INTEGER PRIMARY KEY AUTOINCREMENT," // AUTOINCREMENT сам будет ставить 1, 2, 3...
+				"title TEXT NOT NULL,"   // Сюда пишем заголовок. NOT NULL - чтоб пусты не сохранял
+				"content TEXT NOT NULL"  // Сюда пишем гигантский текст проекта
+				");";
+
+			// sqlite3_exec(sql создает(callback) , sql шаг(arg) , sql завершение(errmsg)). sqlite3_exec - функция-«обертка»
+			sqlite3_exec(db, createTableSQL.c_str(), nullptr, nullptr, nullptr);  // createTableSQL - команда создания таблицы
+			// sqlite3_exec - собирает таблицу
+
+			std::cout << " Введите название Заметки\n";
+			std::getline(std::cin, noteTitle);
+
+			std::cout << " Заметка:\n" << noteTitle << std::endl;
+			std::getline(std::cin, noteContent);
+
+			std::string insertSQL = "INSERT INTO notes (title) VALUES (?);"; // VALUES (?). ' ? ' - знако вопроса выступает в роли заглушки
+			sqlite3_stmt* stmt = nullptr; // sqlite3_stmt - это как контейнер (структура) 
+			// внутри sqlite3_stmt - sqlite3_prepare_v2(Сборка коробки) , sqlite3_bind_text(Загрузка в к...) , sqlite3_step(Запуск к...) , sqlite3_finalize
+
+			if (sqlite3_prepare_v2(db, insertSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+				// В первый знак вопроса (1) пихаем НАЗВАНИЕ
+				sqlite3_bind_text(stmt, 1, noteTitle.c_str(), -1, SQLITE_STATIC); //для сохранения. 1 это номер колонки (title)
+				// std::ofstream myFile(noteTitle); ////////////////
+				if (sqlite3_step(stmt) == SQLITE_DONE) {
+					std::ofstream myFile(noteTitle + ".txt");
+				}
+				
+				
+				sqlite3_finalize(stmt); // Убрали мусор из оперативки
+
+			}
+
+
+
+
+			std::ofstream myFile(noteTitle + ".txt");
 			std::cout << "fasds\n";
-		}
-		else if (*userSymb == a)
-		{
-			//delete userSymb;
-			//userSymb = nullptr;
 
-			std::fstream myFile(title + ".txt", std::ios::in | std::ios::out | std::ios::app);
+
+		}
+		else if (userSymb == 2)
+		{
+			sqlite3_stmt* stmt = nullptr;
+			// 5. ШАГ ТРЕТИЙ: Читаем все заметки из файла (SELECT)
+			std::string selectSQL = "SELECT id, title, content FROM notes;";
+
+			std::string selectSQL = "SELECT id, title, content FROM notes;";
+
+			if (sqlite3_prepare_v2(db, selectSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+				while (sqlite3_step(stmt) == SQLITE_ROW) {
+					int id = sqlite3_column_int(stmt, 0);
+					const unsigned char* title = sqlite3_column_text(stmt, 1);
+					const unsigned char* content = sqlite3_column_text(stmt, 2);
+
+					std::cout << "========================================\n";
+					std::cout << "ID: " << id << " | ТЕМА: " << title << "\n";
+					std::cout << "----------------------------------------\n";
+					std::cout << content << "\n"; // Тут выведется весь твой код Ассемблера
+					std::cout << "========================================\n\n";
+				}
+				sqlite3_finalize(stmt); // Очищаем память за запросом
+			}
+
+			std::fstream myFile(noteTitle + ".txt", std::ios::in | std::ios::out | std::ios::app);
 			
 
 			if (myFile.is_open())
 			{
-				std::cout << " Откртие : " << title + ".txt\n";
+
+				std::cout << " Откртие : " << noteTitle + ".txt\n";
+
+				std::string insertSQL = "INSERT INTO notes (content) VALUES (?);"; // VALUES (?). ' ? ' - знако вопроса выступает в роли заглушки
+				sqlite3_stmt* stmt = nullptr;
+
+				if (sqlite3_prepare_v2(db, insertSQL.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+					
+					// Во второй знак вопроса (2) пихаем ДЛИННЫЙ ТЕКСТ С КОДОМ
+					sqlite3_bind_text(stmt, 2, noteContent.c_str(), -1, SQLITE_STATIC); // 2 это номер колонки (content)
+
+					if (sqlite3_step(stmt) == SQLITE_DONE) {
+						std::cout << " ИТ-заметка успешно сохранена!\n";
+					}
+					sqlite3_finalize(stmt);
 
 				std::string line;
-				while (std::getline(myFile, line )) {
+				while (std::getline(myFile, line )) { // циклом while + std::getline проверяет заполнения.
 					std::cout << line +"\n";
 				}
 				std::cout << "-----------------------\n";
 				myFile.clear();
 
-				std::ofstream cont(title + ".txt\n");
-				cont.open(title + ".txt\n");
+				std::ofstream cont(noteTitle + ".txt\n");
+				cont.open(noteTitle + ".txt\n");
 				std::cin.ignore();
 				std::cout << " Enter Content \n";
-				std::getline(std::cin, content);
+				std::getline(std::cin, noteContent);
 
-				myFile << " " + content << "\n";
+				myFile << " " + noteContent << "\n";
 
 				std::cout << " New Content is add ! \n";
 
 			}
 			else {
-				std::cout << " ERROR we didn`t Found File" << title + ".tht \n";
+				std::cout << " ERROR we didn`t Found File" << noteTitle + ".tht \n";
 			}
+
+			sqlite3_close(db);
+			std::cout << "4. База данных закрыта. Всё надежно сохранено!" << std::endl;
+
+			return 0;
 
 			// ios — это сокращение от Input/Output Stream (поток ввода-вывода)
 		}
@@ -106,7 +189,7 @@ int main() {   // маркер для хакера , л - логика
 			std::cout << "garara here !!!\n";
 		}
 
-	} while (true);
+	} while (userSymb != 1 && userSymb != 2);
 
 	/*else if (userSymb == 2)
 {

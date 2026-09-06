@@ -20,7 +20,7 @@
 
 int notes_m() {
 
-    setlocale(LC_ALL, "Russian");
+    setlocale(LC_ALL, ".UTF-8");
 
     sqlite3* db = nullptr;  // sqlite3 - база данных
 
